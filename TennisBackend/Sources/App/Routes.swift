@@ -2,9 +2,29 @@ import Vapor
 
 extension Droplet {
     func setupRoutes() throws {
+        post("user") { req in
+            guard let json = req.json else {
+                throw Abort(.badRequest, reason: "no json provided")
+            }
+
+            let user: User
+            // try to initialize user with json
+            do {
+                user = try User(json: json)
+            }
+            catch {
+                throw Abort(.badRequest, reason: "incorrect json")
+            }
+            
+            // save user
+            try user.save()
+            // return user
+            return try user.makeJSON()
+        }
+
         get("hello") { req in
             var json = JSON()
-            try json.set("hello", "world")
+            try json.set("yo", "world")
             return json
         }
 
